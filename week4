@@ -1,0 +1,97 @@
+# Base class
+class Character:
+    def __init__(self, name, alias, origin):
+        self.name = name
+        self.alias = alias
+        self.origin = origin
+        self._health = 100  # Encapsulated (private-like)
+        self._reputation = 50  # Encapsulated
+
+    def introduce(self):
+        return f"I am {self.alias} from {self.origin}."
+
+    # Encapsulated access to health
+    def get_health(self):
+        return self._health
+
+    def take_damage(self, amount):
+        self._health -= amount
+        if self._health < 0:
+            self._health = 0
+        return f"{self.alias} takes {amount} damage. Health is now {self._health}."
+
+    def heal(self, amount):
+        self._health = min(100, self._health + amount)
+        return f"{self.alias} heals {amount}. Health is now {self._health}."
+
+    # Encapsulated access to reputation
+    def get_reputation(self):
+        return self._reputation
+
+    def change_reputation(self, amount):
+        self._reputation = max(0, min(100, self._reputation + amount))
+        return f"{self.alias}'s reputation is now {self._reputation}."
+
+
+# Subclass for Superheroes
+class Superhero(Character):
+    def __init__(self, name, alias, powers, origin, team=None):
+        super().__init__(name, alias, origin)
+        self.powers = powers
+        self.team = team or "Solo"
+        self.villains_defeated = 0
+        self.is_active = True
+
+    def use_power(self, power):
+        if not self.is_active:
+            return f"{self.alias} is retired."
+        if power in self.powers:
+            return f"{self.alias} uses {power}!"
+        return f"{self.alias} doesn't have {power}."
+
+    # Polymorphic behavior
+    def introduce(self):
+        return f"I am the hero {self.alias}, sworn to protect {self.origin}!"
+
+    def defeat_villain(self):
+        self.villains_defeated += 1
+        self.change_reputation(10)
+        return f"{self.alias} defeats a villain! Total: {self.villains_defeated}"
+
+
+# Subclass for Villains
+class Villain(Character):
+    def __init__(self, name, alias, powers, origin, evil_plan):
+        super().__init__(name, alias, origin)
+        self.powers = powers
+        self.evil_plan = evil_plan
+        self.crimes_committed = 0
+
+    def execute_plan(self):
+        self.crimes_committed += 1
+        self.change_reputation(-10)
+        return f"{self.alias} executes evil plan: {self.evil_plan}. Crimes committed: {self.crimes_committed}"
+
+    # Polymorphic behavior
+    def introduce(self):
+        return f"I am {self.alias}, the nightmare of {self.origin}!"
+
+
+# Example usage
+hero = Superhero("Lena Nova", "Starflare", ["Energy Blasts", "Teleportation"], "Stellar City", "Galactic Front")
+villain = Villain("Victor Shade", "Night Viper", ["Mind Control", "Illusions"], "Shadow Realm", "Dominate the World")
+
+# Polymorphism in action
+print(hero.introduce())
+print(villain.introduce())
+
+# Encapsulation and behavior
+print(hero.use_power("Teleportation"))
+print(villain.execute_plan())
+print(hero.defeat_villain())
+
+print(hero.take_damage(20))
+print(villain.heal(15))
+
+print(f"{hero.alias} health: {hero.get_health()}")
+print(f"{villain.alias} reputation: {villain.get_reputation()}")
